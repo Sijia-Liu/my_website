@@ -1,5 +1,5 @@
 # Site settings
-baseURL = "https://sijialiuweb.netlify.app"
+baseURL = "https://sijialiu.netlify.app"
 languageCode = "en-us"
 title = "Sijia Liu"
 theme = "forty"
