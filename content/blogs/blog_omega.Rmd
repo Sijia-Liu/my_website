@@ -1,0 +1,201 @@
+---
+categories:
+- ""
+- ""
+date: "2020-09-10"
+description: "Are women and men paid differently?"
+draft: false
+image: picgender.jpg
+keywords: ""
+slug: blog3
+title: Pay Discrimination Analysis
+---
+
+```{r, setup, echo=FALSE}
+knitr::opts_chunk$set(
+  message = FALSE, 
+  warning = FALSE, 
+  tidy=FALSE,     # display code as typed
+  size="small")   # slightly smaller font for code
+options(digits = 3)
+
+# default figure size
+knitr::opts_chunk$set(
+  fig.width=6.75, 
+  fig.height=6.75,
+  fig.align = "center"
+)
+```
+
+
+```{r load-libraries, echo=FALSE}
+library(GGally) # Create ggpair 
+library(here) # Load data
+library(infer) # Hypothesis testing
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+```
+## Background
+
+Are men and women paid differently? In this blog we try to conclude if there is a salary difference between gender in a company called Omega, using predominantly hypothesis testing and bootstrap sampling.
+
+## Load the data
+As shown below, our data has 3 variables, salary, gender and work experience; and 50 obeservations.
+```{r load_omega_data}
+
+omega <- read_csv(here::here("data", "omega.csv"))
+glimpse(omega) # examine the data frame
+
+```
+
+## Relationship Salary - Gender ?
+
+First, we look at the summary statistics on salary by gender, and create a 95% confidence interval for the mean salary of each gender. The confidence intervals of mean salary are (61486, 67599) and (70088, 76390) for female and male respectively.
+
+But what does is a 95% confidence interval? It means we are 95% confident that the population's mean salary would be covered by this interval. If we choose our significant level to be 0.05, since there is no overlap between these two confidence intervals, we conclude there is statistically significant difference in salary between male and female employees. 
+```{r confint_single_valiables}
+
+# Summary Statistics of salary by gender
+mosaic::favstats (salary ~ gender, data=omega)
+
+# Dataframe with two rows (male-female) and having as columns gender, mean, SD, sample size, 
+# the t-critical value, the standard error, the margin of error, 
+# and the low/high endpoints of a 95% condifence interval
+
+omega %>% 
+  group_by(gender) %>% 
+  summarise(mean = mean(salary),
+            SD = sd(salary),
+            sample_size = n(),
+            t_critical = qt(0.975, sample_size - 1),
+            SE = SD/sqrt(sample_size),
+            margin_of_error = SE*t_critical,
+            lower_ci = mean - margin_of_error,
+            upper_ci = mean + margin_of_error)
+
+```
+
+We can also use hypothesis testing to see if they are different. Starting with writing down our null and alternative hypothesis:
+
+*Null Hypothesis (H0)* | Mean salary of male = Mean salary of female in Omega (mean salary of male - mean salary of female = 0)
+
+*Alternative Hypothesis (H1)* | Mean salary of male != Mean salary of female in Omega (mean salary of male - mean salary of female != 0 in Omega)
+
+Both t test and bootstrap could be used for this question. To give myself more practice, I run both of them and let's see if they give us the same result.
+
+```{r hypothesis_testing_t.test}
+
+# hypothesis testing using t.test() 
+omega <- omega %>% 
+  mutate(gender = as.factor(gender)) # convert character into factor
+
+t.test(salary ~ gender, data = omega, alternative = 'two.sided') 
+
+```
+```{r hypothesis_testing_infer}
+
+# hypothesis testing using infer package
+set.seed(1234)
+hypothesis_infer <- omega %>% 
+  specify(salary ~ gender) %>% 
+  hypothesise('independence') %>% 
+  generate(reps = 1000, type = 'permute') %>% 
+  calculate(stat = 'diff in means', order = c('female','male')) 
+
+hypothesis_infer %>% get_pvalue(obs_stat = mean(omega$salary[omega$gender == 'female'] ) -
+                                  mean(omega$salary[omega$gender == 'male']), 
+                                direction = 'both')
+
+
+```
+In both t.test and bootstrap hypothesis test, the p-value generated is less than the alpha value of 0,05. Therefore, we reject H0 and conclude that there is a statistically significant difference in salary between male and female employees in Omega. Note that in bootstrap, the p-value = 0 is due to rounding, the true value should be really close to 0 but not identical to it.
+
+## Relationship Experience - Gender?
+
+
+**(1) - Based on this evidence, can you conclude that there is a significant difference between the experience of the male and female executives? Perform similar analyses as in the previous section. Does your conclusion validate or endanger your conclusion about the difference in male and female salaries?**  
+
+However, if we also look at the boxplot of work experience by gender, we can see women in Omega have less experience than men on average. It could be that the work experience is also affecting men and women's earning. 
+
+```{r  ggpairs}
+
+omega %>% 
+  select(gender, experience, salary) %>% #order variables they will appear in ggpairs()
+  ggpairs(aes(colour=gender, alpha = 0.3))+
+  theme_bw()
+
+```
+To test if there is difference in work experience between men and women in Omega, we run hypothesis testing again:
+
+*Null Hypothesis (H0)* | Mean work experience of male = Mean work experience of female in Omega (mean work experience of male - mean work experience of female = 0 in Omega)
+
+*Alternative Hypothesis (H1)* | Mean work experience of male != Mean work experience of female in Omega (mean work experience of male - mean work experience of female != 0 in Omega)
+
+```{r ci_exp_gender}
+
+omega %>% 
+  group_by(gender) %>% 
+  summarise(mean = mean(experience),
+            SD = sd(experience),
+            sample_size = n(),
+            t_critical = qt(0.975, sample_size - 1),
+            SE = SD/sqrt(sample_size),
+            margin_of_error = SE*t_critical,
+            lower_ci = mean - margin_of_error,
+            upper_ci = mean + margin_of_error)
+```
+
+```{r hypothesis_testing_exp_gender}
+# hypothesis testing using t.test() 
+t.test(experience ~ gender, data = omega, alternative = 'two.sided') 
+
+# hypothesis testing using infer package
+set.seed(1234)
+hypothesis_infer <- omega %>% 
+  specify(experience ~ gender) %>% 
+  hypothesise('independence') %>% 
+  generate(reps = 1000, type = 'permute') %>% 
+  calculate(stat = 'diff in means', order = c('female','male')) 
+
+hypothesis_infer %>% get_pvalue(obs_stat = mean(omega$experience[omega$gender == 'female'] ) -
+                                  mean(omega$experience[omega$gender == 'male']), direction = 'both')
+  
+```
+Since there is no overlap in confidence intervals and our p-value is less than the alpha value (a=0.05), we should reject the null hypothesis that the mean work experience of a male employee is equal to the mean work experience of a female employee at Omega. Thus, we can conclude that there is a statistically significant difference in male and female employees' levels of work experience. This endangers our previous conclusion that the salary difference is because of gender. 
+
+## Relationship Salary - Experience ?
+
+Aha! So it could be possible that the seemingly discrimination in salary between male and female is related to the work experience factor. Let's use a scatterplot and 2 regression lines to see the relationship between salary and experience.
+
+We can see that in fact, a unit increase in experience is associated with a greater salary increase for female than male employees, since the regression line for female employees is steeper. All the above findings suggest that the salary heterogeneity between female and male employees is a mixed effect of gender, experience and potentially, other (unobserved) variables.
+
+```{r salary_exp_scatter, fig.height=5, fig.width=10, fig.align="centre"}
+
+omega %>% 
+  ggplot(aes(x = experience, y = salary, color = gender)) +
+  geom_point() +
+  geom_smooth(method = lm, aes(color = gender)) +
+  labs(title = 'Work Experience is More Strongly Correlated with Salary for Female Employees',
+       subtitle = 'Relationship between years of work experience and salary by gender',
+       x = 'Experience (Years)',
+       y = 'Annual Salary',
+       caption = 'Source: Omega Group Plc.') + theme(legend.position="none") + scale_y_continuous(labels = scales::dollar)
+
+```
+
+So what is our conclusion? Does gender lead to salary difference? We don't know the answer. All the tests and regressions we have done show only the association between variables, but not causal effects. However, we can still use gender, work experience and other features of an employee to predict or explain their salary.
+
+## Details
+
+**Adapted from:**
+*Assignment from [Applied Statistics with R](https://mam2021.netlify.app), London Business School *
+
+**Course Instructor:**
+*[Kostis Christodoulou](https://www.london.edu/faculty-and-research/faculty-profiles/k/kostis-christodoulou)*
+
+**Original assignment collaborated with:**
+*Study Group 11: Abhinav Bhardwaj, Alberto Lambert, Anna Plaschke, Bartek Makuch,, Feiyang Ni*
+
+
+
+
+

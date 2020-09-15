@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Analytics blogs on Sijia Liu</title>
+    <link>/blogs/</link>
+    <description>Recent content in Analytics blogs on Sijia Liu</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 31 Oct 2017 22:27:21 -0500</lastBuildDate>
+    
+	<atom:link href="/blogs/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>GDP Analysis</title>
+      <link>/blogs/blog1/</link>
+      <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blogs/blog1/</guid>
+      <description>Background Gross Domestic Product (GDP) measures the market value of all the final goods and services produced in a specific time period. According to Wikipedia, GDP (Y) can be written as below:
+ Y = C + I + G + (X − M)
+  C (consumption)：Consisting of private expenditures in the economy, named as Household Expenditure in our data I (investment): Business investment, named as Gross Capital Formation in our data G (government spending): Sum of government expenditure, named Government expenditure in out data X (exports): Gross exports, same name in our data M (imports): Gross imports, same name in our data X - M (net exports): Net exports, not given in data but easy to calculate with code  In this analysis, we look at GDP and GDP components from mature and emerging markets (3 selected countries in each) between 1970 to 2017, estimated by United Nations’ National Accounts Main Aggregates Database.</description>
+    </item>
+    
+    <item>
+      <title>NYSE Stock Analysis</title>
+      <link>/blogs/blog2/</link>
+      <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blogs/blog2/</guid>
+      <description>Background This time we are working with 508 New York Stock Exchange (NYSE)) stocks. We first conduct some simple exploratory analysis, and then chose 6 stocks of interest to show the relationship between their expected monthly returns and the risk to make a recommendation for choosing stock.
+ Load packages library(tidyverse) # Load ggplot2, dplyr, and all the other tidyverse packages library(ggrepel) # To add text to plots library(tidyquant) # To load stock prices and calculate returns library(kableExtra) # For better table format library(scales) # Show numbers in percentage  Data cleaning and exploring nyse &amp;lt;- read_csv(here::here(&amp;quot;data&amp;quot;,&amp;quot;nyse.</description>
+    </item>
+    
+    <item>
+      <title>Pay Discrimination Analysis</title>
+      <link>/blogs/blog3/</link>
+      <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blogs/blog3/</guid>
+      <description>Background Are men and women paid differently? In this blog we try to conclude if there is a salary difference between gender in a company called Omega, using predominantly hypothesis testing and bootstrap sampling.
+ Load the data As shown below, our data has 3 variables, salary, gender and work experience; and 50 obeservations.
+omega &amp;lt;- read_csv(here::here(&amp;quot;data&amp;quot;, &amp;quot;omega.csv&amp;quot;)) glimpse(omega) # examine the data frame ## Rows: 50 ## Columns: 3 ## $ salary &amp;lt;dbl&amp;gt; 81894, 69517, 68589, 74881, 65598, 76840, 78800, 70033, 6… ## $ gender &amp;lt;chr&amp;gt; &amp;quot;male&amp;quot;, &amp;quot;male&amp;quot;, &amp;quot;male&amp;quot;, &amp;quot;male&amp;quot;, &amp;quot;male&amp;quot;, &amp;quot;male&amp;quot;, &amp;quot;male&amp;quot;, &amp;quot;… ## $ experience &amp;lt;dbl&amp;gt; 16, 25, 15, 33, 16, 19, 32, 34, 1, 44, 7, 14, 33, 19, 24,…  Relationship Salary - Gender ?</description>
+    </item>
+    
+  </channel>
+</rss>

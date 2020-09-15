@@ -1,0 +1,457 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="Your description">
+	<meta name="author" content="Sijia Liu">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>NYSE Stock Analysis &middot; Sijia Liu</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Sijia Liu</strong> <span></span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/blogs">Blogs</a></li>
+            
+                <li><a href="/resume.html">My Resume</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/blogs" class="button special fit">Get Started</a></li>
+            
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>NYSE Stock Analysis</h1>
+                            </header>
+                            
+                                <span class="image main"><img src="/img/blogs/picstock.jpg" alt="" /></span>
+                            
+                            
+<script src="/rmarkdown-libs/kePrint/kePrint.js"></script>
+<link href="/rmarkdown-libs/lightable/lightable.css" rel="stylesheet" />
+
+
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>This time we are working with 508 New York Stock Exchange (NYSE)) stocks. We first conduct some simple exploratory analysis, and then chose 6 stocks of interest to show the relationship between their expected monthly returns and the risk to make a recommendation for choosing stock.</p>
+</div>
+<div id="load-packages" class="section level2">
+<h2>Load packages</h2>
+<pre class="r"><code>library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages
+library(ggrepel) # To add text to plots
+library(tidyquant) # To load stock prices and calculate returns
+library(kableExtra) # For better table format 
+library(scales) # Show numbers in percentage</code></pre>
+</div>
+<div id="data-cleaning-and-exploring" class="section level2">
+<h2>Data cleaning and exploring</h2>
+<pre class="r"><code>nyse &lt;- read_csv(here::here(&quot;data&quot;,&quot;nyse.csv&quot;))</code></pre>
+<p>First let’s see how many companies are there in each sectors. we produce a bar plot showing the number of companies per sector, in descending order</p>
+<pre class="r"><code>companies_by_sector &lt;- nyse %&gt;% 
+  group_by(sector) %&gt;%
+  summarise(count = n()) 
+
+ggplot(companies_by_sector, aes(x = reorder(sector, count), y = count)) + 
+  
+  geom_col(fill = &quot;#1380A1&quot;) + 
+  
+  theme_bw()+
+  theme(plot.title = element_text(face = &#39;bold&#39;, size = 15), # bold title, set text size
+        axis.text.x = element_text(size = 8), 
+        axis.text.y = element_text(size= 8)) +
+  
+  geom_label(aes(label = count), # add label to each bar
+             hjust = 1,
+             vjust = 0.5,
+             fill = NA,
+             label.size = NA,
+             color = &#39;White&#39;,
+             size = 4) +
+  
+  labs(x = &quot;&quot;, 
+       y = &quot;Number of Companies&quot;, 
+       title = &#39;Finance &amp; Consumer Services companies reign NYSE&#39;,
+       subtitle = &#39;NYSE number of companies by sector&#39;) +
+  
+  coord_flip() </code></pre>
+<p><img src="/blogs/blog_financial_files/figure-html/companies_per_sector-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="analyse-stock-returns" class="section level2">
+<h2>Analyse stock returns</h2>
+<p>Next, we choose 6 stocks of interest as well as <code>SPY</code> , which is SP500 ETF to analyse their returns. You can use <code>tq_get()</code> to get the stock prices from Yahoo Finance. We also specify our study period to be <code>2011-01-01</code> to <code>2020-08-31</code></p>
+<pre class="r"><code>myStocks &lt;- c(&quot;JPM&quot;,&quot;DIS&quot;,&quot;DPZ&quot;,&quot;ANF&quot;,&quot;TSLA&quot;,&quot;XOM&quot;,&quot;SPY&quot; ) %&gt;%
+  tq_get(get  = &quot;stock.prices&quot;,
+         from = &quot;2011-01-01&quot;,
+         to   = &quot;2020-08-31&quot;) %&gt;%
+  group_by(symbol) 
+
+glimpse(myStocks) # examine the structure of the resulting data frame</code></pre>
+<pre><code>## Rows: 17,017
+## Columns: 8
+## Groups: symbol [7]
+## $ symbol   &lt;chr&gt; &quot;JPM&quot;, &quot;JPM&quot;, &quot;JPM&quot;, &quot;JPM&quot;, &quot;JPM&quot;, &quot;JPM&quot;, &quot;JPM&quot;, &quot;JPM&quot;, &quot;JP…
+## $ date     &lt;date&gt; 2011-01-03, 2011-01-04, 2011-01-05, 2011-01-06, 2011-01-07…
+## $ open     &lt;dbl&gt; 43.0, 43.8, 43.9, 44.4, 44.5, 43.3, 43.7, 44.4, 44.9, 44.5,…
+## $ high     &lt;dbl&gt; 44.0, 44.3, 45.0, 44.8, 44.6, 43.8, 44.0, 44.9, 45.0, 45.9,…
+## $ low      &lt;dbl&gt; 43.0, 43.3, 43.9, 44.2, 42.7, 43.0, 43.4, 44.2, 44.2, 44.5,…
+## $ close    &lt;dbl&gt; 43.6, 44.2, 44.7, 44.5, 43.6, 43.4, 43.6, 44.7, 44.5, 44.9,…
+## $ volume   &lt;dbl&gt; 43278500, 40036800, 50032500, 31606200, 69579400, 30098100,…
+## $ adjusted &lt;dbl&gt; 33.3, 33.8, 34.2, 34.0, 33.4, 33.2, 33.4, 34.2, 34.0, 34.4,…</code></pre>
+<p>Now we calculate the daily, monthly and yearly returns using <code>tidyquant::tq_transmute</code> And investigate their common statistics of monthly returns.</p>
+<pre class="r"><code>#calculate daily returns
+myStocks_returns_daily &lt;- myStocks %&gt;%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = &quot;daily&quot;, 
+               type       = &quot;arithmetic&quot;,
+               col_rename = &quot;daily_returns&quot;,
+               cols = c(nested.col))  
+
+#calculate monthly  returns
+myStocks_returns_monthly &lt;- myStocks %&gt;%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = &quot;monthly&quot;, 
+               type       = &quot;arithmetic&quot;,
+               col_rename = &quot;monthly_returns&quot;,
+               cols = c(nested.col)) 
+
+#calculate yearly returns
+myStocks_returns_annual &lt;- myStocks %&gt;%
+  group_by(symbol) %&gt;%
+  tq_transmute(select     = adjusted, 
+               mutate_fun = periodReturn, 
+               period     = &quot;yearly&quot;, 
+               type       = &quot;arithmetic&quot;,
+               col_rename = &quot;yearly_returns&quot;,
+               cols = c(nested.col))</code></pre>
+<pre class="r"><code>#We group the monthly returns data by symbol, and create the summary variables in summarise, before arranging by mean in descending order
+summary_monthly_stock_returns &lt;- myStocks_returns_monthly %&gt;% 
+  
+  group_by(symbol) %&gt;% 
+  
+  summarise(min = label_percent()(min(monthly_returns)),
+            max = label_percent()(max(monthly_returns)),
+            median = label_percent()(median(monthly_returns)),
+            mean = label_percent()(mean(monthly_returns)), 
+            SD = label_percent()(sd(monthly_returns))) %&gt;% 
+  
+  arrange(desc(mean))
+
+#We publish these results as a table
+kbl(summary_monthly_stock_returns,
+    col.names=c(&quot;Stock Ticker&quot;,
+                &quot;Minimum Monthly Returns&quot;,
+                &quot;Maximum Monthly Returns&quot;,
+                &quot;Median Monthly Returns&quot;,
+                &quot;Mean Monthly Returns&quot;,
+                &quot;Standard Deviation Monthly Returns &quot;)) %&gt;%
+kable_styling()</code></pre>
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Stock Ticker
+</th>
+<th style="text-align:left;">
+Minimum Monthly Returns
+</th>
+<th style="text-align:left;">
+Maximum Monthly Returns
+</th>
+<th style="text-align:left;">
+Median Monthly Returns
+</th>
+<th style="text-align:left;">
+Mean Monthly Returns
+</th>
+<th style="text-align:left;">
+Standard Deviation Monthly Returns
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+TSLA
+</td>
+<td style="text-align:left;">
+-22%
+</td>
+<td style="text-align:left;">
+81%
+</td>
+<td style="text-align:left;">
+1%
+</td>
+<td style="text-align:left;">
+5%
+</td>
+<td style="text-align:left;">
+17%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DPZ
+</td>
+<td style="text-align:left;">
+-19%
+</td>
+<td style="text-align:left;">
+34%
+</td>
+<td style="text-align:left;">
+3%
+</td>
+<td style="text-align:left;">
+3%
+</td>
+<td style="text-align:left;">
+7%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DIS
+</td>
+<td style="text-align:left;">
+-18%
+</td>
+<td style="text-align:left;">
+23%
+</td>
+<td style="text-align:left;">
+1%
+</td>
+<td style="text-align:left;">
+1%
+</td>
+<td style="text-align:left;">
+6%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+JPM
+</td>
+<td style="text-align:left;">
+-23%
+</td>
+<td style="text-align:left;">
+17%
+</td>
+<td style="text-align:left;">
+2%
+</td>
+<td style="text-align:left;">
+1%
+</td>
+<td style="text-align:left;">
+7%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+SPY
+</td>
+<td style="text-align:left;">
+-12%
+</td>
+<td style="text-align:left;">
+13%
+</td>
+<td style="text-align:left;">
+1%
+</td>
+<td style="text-align:left;">
+1%
+</td>
+<td style="text-align:left;">
+4%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ANF
+</td>
+<td style="text-align:left;">
+-42%
+</td>
+<td style="text-align:left;">
+51%
+</td>
+<td style="text-align:left;">
+0%
+</td>
+<td style="text-align:left;">
+0%
+</td>
+<td style="text-align:left;">
+14%
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+XOM
+</td>
+<td style="text-align:left;">
+-26%
+</td>
+<td style="text-align:left;">
+22%
+</td>
+<td style="text-align:left;">
+0%
+</td>
+<td style="text-align:left;">
+0%
+</td>
+<td style="text-align:left;">
+6%
+</td>
+</tr>
+</tbody>
+</table>
+<p>We now visualise the distribution of each stock’s monthly returns.</p>
+<p>We can see that, the Tesla (TSLA) stock is most risky, since the distribution of monthly returns is widest, showing high variation. Further, it is skewed positively, meaning this variation falls around and below a return of 0.00%. While Abercrombie &amp; Fitch Co. (ANF) may seem similarly risky, this shows a higher peak, and therefore a narrower distribution, meaning less variation in monthly returns. This means it is a more certain, or less risky, investment.</p>
+<p>The least risky stock is Exxon Mobil (XOM), which has the highest peak of all the stock distributions. Despite being centred on a mode value of 0, as this has the narrowest distribution of monthly returns, it carries the highest certainty.</p>
+<p>Though SP500 ETF shows the least risk of all the assets by far, with an extremely narrow distribution, it is an index, not a stock so this shouldn’t come as a surprise.</p>
+<pre class="r"><code>#We create a density plot, with appropriately labelled axes and an appropriate title, faceted by stock ticker
+ggplot(myStocks_returns_monthly, aes(x=monthly_returns)) + 
+  geom_density() + 
+  facet_wrap(~symbol) + 
+  labs(x=&quot;Monthly Returns&quot;, y=&quot;Density&quot;, title=&quot;Density Plot of Monthly Returns for Stock Portfolio &amp; SP500 ETF&quot;) +
+  theme_bw()</code></pre>
+<p><img src="/blogs/blog_financial_files/figure-html/density_monthly_returns-1.png" width="648" style="display: block; margin: auto;" /></p>
+<p>Finally, we make a plot that shows the expected monthly return (mean) of a stock on the Y axis and the risk (standard deviation) in the X-axis.</p>
+<p>This plot demonstrates that there is a generally positive correlation between expected return (mean) and risk (standard deviation), which is to be expected since investors willing to take on greater risk expect a higher return for it, otherwise the risk is not worth taking on.</p>
+<p>Yet, as we observed in the density plot above, while A&amp;F has high variability in its monthly returns (it is risky), its mean monthly return is actually negative. This, like Exxon Mobil, contradicts the general observed relationship between risk (monthly price variation, SD) and mean return, by having higher-than-expected variation given its low (~0.00%) mean monthly return.</p>
+<pre class="r"><code>#We create a standard scatter plot, labelling axes appropriately
+ggplot(summary_monthly_stock_returns, aes(x=SD, y=mean, label=symbol)) + 
+  
+  geom_point(alpha=1) + 
+  geom_text_repel() + 
+  
+  labs(x=&quot;Risk of Stock&quot;, 
+       y=&quot;Expected Monthly Return&quot;, 
+       title = &quot;Higher the Risk, Higher the Gain?&quot;,
+       subtitle = &quot;Standard deviation (x axis) and mean monthly return (y axis) of selected stock and SPF500&quot;) +
+  theme_bw() +
+  theme(plot.title = element_text(face = &#39;bold&#39;, size = 15))</code></pre>
+<p><img src="/blogs/blog_financial_files/figure-html/risk_return_plot-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
+<div id="details" class="section level2">
+<h2>Details</h2>
+<p><strong>Adapted from:</strong>
+<em>Assignment from <a href="https://mam2021.netlify.app">Applied Statistics with R</a>, London Business School </em></p>
+<p><strong>Course Instructor:</strong>
+<em><a href="https://www.london.edu/faculty-and-research/faculty-profiles/k/kostis-christodoulou">Kostis Christodoulou</a></em></p>
+<p><strong>Original assignment collaborated with:</strong>
+<em>Study Group 11: Abhinav Bhardwaj, Alberto Lambert, Anna Plaschke, Bartek Makuch,, Feiyang Ni</em></p>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.instagram.com/scarlettliu25/" class="icon alt fa-instagram" target="_blank"><span class="label">instagram</span></a></li>
+                
+                    <li><a href="www.linkedin.com/in/sijia-liu1" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+                    <li><a href="https://www.github.com" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Sijia Liu</li>
+                
+                <li> <a href=""></a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE HTML>
+<html>
+
+    <head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<meta name="description" content="Your description">
+	<meta name="author" content="Sijia Liu">
+	<meta name="generator" content="Hugo 0.74.3" />
+	<title>GDP Analysis &middot; Sijia Liu</title>
+	<!-- Stylesheets -->
+	
+	<link rel="stylesheet" href="/css/main.css"/>
+	
+	
+
+	
+
+	<!-- Custom Fonts -->
+	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+	
+	<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+	
+
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="js/ie/html5shiv.js"></script>
+	<script src="js/ie/html5shiv.jsrespond.min.js"></script>
+	<![endif]-->
+</head>
+
+    <body>
+
+    <!-- Wrapper -->
+        <div id="wrapper">
+
+            <!-- Header -->
+    <header id="header" class="alt">
+        <a href="/" class="logo"><strong>Sijia Liu</strong> <span></span></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+<!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            
+                <li><a href="/">Home</a></li>
+            
+                <li><a href="/blogs">Blogs</a></li>
+            
+                <li><a href="/resume.html">My Resume</a></li>
+            
+
+        </ul>
+        <ul class="actions vertical">
+            
+                <li><a href="/blogs" class="button special fit">Get Started</a></li>
+            
+            
+        </ul>
+    </nav>
+
+        <!-- Main -->
+            <div id="main" class="alt">
+
+                
+                    <section id="one">
+                        <div class="inner">
+                            <header class="major">
+                                <h1>GDP Analysis</h1>
+                            </header>
+                            
+                                <span class="image main"><img src="/img/blogs/picGDP.jpg" alt="" /></span>
+                            
+                            
+
+
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>Gross Domestic Product (GDP) measures the market value of all the final goods and services produced in a specific time period. According to <a href="https://en.wikipedia.org/wiki/Gross_domestic_product#Components_of_GDP_by_expenditure">Wikipedia</a>, GDP (Y) can be written as below:</p>
+<blockquote>
+<p>Y = C + I + G + (X − M)</p>
+</blockquote>
+<ul>
+<li>C (consumption)：Consisting of private expenditures in the economy, named as Household Expenditure in our data</li>
+<li>I (investment): Business investment, named as Gross Capital Formation in our data</li>
+<li>G (government spending): Sum of government expenditure, named Government expenditure in out data</li>
+<li>X (exports): Gross exports, same name in our data</li>
+<li>M (imports): Gross imports, same name in our data</li>
+<li>X - M (net exports): Net exports, not given in data but easy to calculate with code</li>
+</ul>
+<p>In this analysis, we look at GDP and GDP components from mature and emerging markets (3 selected countries in each) between 1970 to 2017, estimated by <a href="https://unstats.un.org/unsd/snaama/Downloads">United Nations’ National Accounts Main Aggregates Database</a>. You can download the data <a href="http://unstats.un.org/unsd/amaapi/api/file/6">here</a> .</p>
+</div>
+<div id="load-packages" class="section level2">
+<h2>Load packages</h2>
+<pre class="r"><code>library(readxl) # Read Excel
+library(here) # Get local repository 
+library(skimr) # Skim a dataframe
+library(countrycode) # Map country name to region, continent, currency .etc
+library(scales) # Change scales in ggplot
+library(patchwork)
+library(tidyverse)  # Load ggplot2, dplyr, and all the other tidyverse packages</code></pre>
+</div>
+<div id="load-the-data" class="section level2">
+<h2>Load the data</h2>
+<pre class="r"><code>UN_GDP_data  &lt;-  read_excel(here::here(&quot;data&quot;, &quot;Download-GDPconstant-USD-countries.xls&quot;), # Excel filename
+                sheet=&quot;Download-GDPconstant-USD-countr&quot;, # Sheet name
+                skip=2) # Number of rows to skip</code></pre>
+</div>
+<div id="data-manipulation" class="section level2">
+<h2>Data Manipulation</h2>
+<p>First, we have a look at our data. It has 3685 rows, and 51 variables. We can see it has indicator name in a column and each year’s value in its own column.</p>
+<pre class="r"><code>head(UN_GDP_data)</code></pre>
+<pre><code>## # A tibble: 6 x 51
+##   CountryID Country IndicatorName `1970` `1971` `1972` `1973` `1974` `1975`
+##       &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1         4 Afghan… Final consum… 5.56e9 5.33e9 5.20e9 5.75e9 6.15e9 6.32e9
+## 2         4 Afghan… Household co… 5.07e9 4.84e9 4.70e9 5.21e9 5.59e9 5.65e9
+## 3         4 Afghan… General gove… 3.72e8 3.82e8 4.02e8 4.21e8 4.31e8 5.98e8
+## 4         4 Afghan… Gross capita… 9.85e8 1.05e9 9.19e8 9.19e8 1.18e9 1.37e9
+## 5         4 Afghan… Gross fixed … 9.85e8 1.05e9 9.19e8 9.19e8 1.18e9 1.37e9
+## 6         4 Afghan… Exports of g… 1.12e8 1.45e8 1.73e8 2.18e8 3.00e8 3.16e8
+## # … with 42 more variables: `1976` &lt;dbl&gt;, `1977` &lt;dbl&gt;, `1978` &lt;dbl&gt;,
+## #   `1979` &lt;dbl&gt;, `1980` &lt;dbl&gt;, `1981` &lt;dbl&gt;, `1982` &lt;dbl&gt;, `1983` &lt;dbl&gt;,
+## #   `1984` &lt;dbl&gt;, `1985` &lt;dbl&gt;, `1986` &lt;dbl&gt;, `1987` &lt;dbl&gt;, `1988` &lt;dbl&gt;,
+## #   `1989` &lt;dbl&gt;, `1990` &lt;dbl&gt;, `1991` &lt;dbl&gt;, `1992` &lt;dbl&gt;, `1993` &lt;dbl&gt;,
+## #   `1994` &lt;dbl&gt;, `1995` &lt;dbl&gt;, `1996` &lt;dbl&gt;, `1997` &lt;dbl&gt;, `1998` &lt;dbl&gt;,
+## #   `1999` &lt;dbl&gt;, `2000` &lt;dbl&gt;, `2001` &lt;dbl&gt;, `2002` &lt;dbl&gt;, `2003` &lt;dbl&gt;,
+## #   `2004` &lt;dbl&gt;, `2005` &lt;dbl&gt;, `2006` &lt;dbl&gt;, `2007` &lt;dbl&gt;, `2008` &lt;dbl&gt;,
+## #   `2009` &lt;dbl&gt;, `2010` &lt;dbl&gt;, `2011` &lt;dbl&gt;, `2012` &lt;dbl&gt;, `2013` &lt;dbl&gt;,
+## #   `2014` &lt;dbl&gt;, `2015` &lt;dbl&gt;, `2016` &lt;dbl&gt;, `2017` &lt;dbl&gt;</code></pre>
+<p>To make our work easier, we reshape this data to a longer form, having all the years in one column, and all the values in one column. We also want to select only GDP and GDP components in the indicators, then show values in billions.</p>
+<pre class="r"><code>tidy_GDP_data  &lt;-  UN_GDP_data %&gt;%
+  
+  # reshape data using pivot_longer
+  pivot_longer(cols = 4:51, names_to = &#39;Year&#39;, values_to = &#39;Value&#39;) %&gt;% 
+  
+  # only keep GDP and GDP components
+  filter(IndicatorName %in% c(&#39;Gross capital formation&#39;, 
+                    &#39;Exports of goods and services&#39;,
+                    &#39;Imports of goods and services&#39;,
+                    &#39;General government final consumption expenditure&#39;,
+                    &#39;Household consumption expenditure (including Non-profit institutions serving households)&#39;,
+                    &#39;Gross Domestic Product (GDP)&#39;)) %&gt;%
+  
+  # give indicators into shorters using case_when and mutate
+  mutate(IndicatorName = case_when(IndicatorName == &#39;Gross capital formation&#39; ~ &#39;Gross capital formation&#39;,
+                 IndicatorName == &#39;Exports of goods and services&#39; ~ &#39;Exports&#39;,
+                 IndicatorName == &#39;Imports of goods and services&#39; ~ &#39;Imports&#39;,
+                 IndicatorName == &#39;General government final consumption expenditure&#39; ~ &#39;Government expenditure&#39;,
+                 IndicatorName == &#39;Household consumption expenditure (including Non-profit institutions serving households)&#39; ~ &#39;Household expenditure&#39;,
+                 
+                 # Given GDP and calculated (by components) GDP are not identical, so we rename it as GDP_given 
+                 IndicatorName == &#39;Gross Domestic Product (GDP)&#39; ~ &#39;GDP_given&#39;), 
+         
+         # show values in billions
+         Value = Value/1e9,
+         
+         # map country to region, function fails to match Micronesia, so we add it manually
+         Region = countrycode(Country, origin = &#39;country.name&#39;, destination = &#39;region&#39;,
+                              custom_match = c(&quot;Micronesia (FS of)&quot; = &quot;East Asia &amp; Pacific&quot;))) 
+
+glimpse(tidy_GDP_data)</code></pre>
+<pre><code>## Rows: 63,072
+## Columns: 6
+## $ CountryID     &lt;dbl&gt; 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, …
+## $ Country       &lt;chr&gt; &quot;Afghanistan&quot;, &quot;Afghanistan&quot;, &quot;Afghanistan&quot;, &quot;Afghanis…
+## $ IndicatorName &lt;chr&gt; &quot;Household expenditure&quot;, &quot;Household expenditure&quot;, &quot;Hou…
+## $ Year          &lt;chr&gt; &quot;1970&quot;, &quot;1971&quot;, &quot;1972&quot;, &quot;1973&quot;, &quot;1974&quot;, &quot;1975&quot;, &quot;1976&quot;…
+## $ Value         &lt;dbl&gt; 5.07, 4.84, 4.70, 5.21, 5.59, 5.65, 5.68, 6.15, 6.30, …
+## $ Region        &lt;chr&gt; &quot;South Asia&quot;, &quot;South Asia&quot;, &quot;South Asia&quot;, &quot;South Asia&quot;…</code></pre>
+</div>
+<div id="most-and-least-gdp-growth" class="section level2">
+<h2>Most and least % GDP growth</h2>
+<p>Lots of things happened during 1970 - 2017, in this chapter we want to see who has seen the most and the least % GDP growth in this period.</p>
+<p>To calculate the % growth, it’s easier to go back to the <strong>untidy</strong> form of dataframe, to have it in a wider shape. I want to practice pivot_longer/pivot_wider functions just learned, but group_by and summarise functions from tidyverse should also work.</p>
+<pre class="r"><code>GDP_data_start_and_end &lt;- tidy_GDP_data %&gt;% 
+  
+  filter(Year %in% c(1970, 2017), # the start and end of this period
+         IndicatorName == &#39;GDP_given&#39;) %&gt;% # only keep GDP_given in our indicators
+  
+  pivot_wider(names_from = Year, values_from = Value) %&gt;% 
+  
+  mutate(GrowthRate = `2017`/`1970` - 1)
+
+head(GDP_data_start_and_end,3)</code></pre>
+<pre><code>## # A tibble: 3 x 7
+##   CountryID Country    IndicatorName Region             `1970` `2017` GrowthRate
+##       &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;         &lt;chr&gt;               &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;
+## 1         4 Afghanist… GDP_given     South Asia          10.7    22.2       1.07
+## 2         8 Albania    GDP_given     Europe &amp; Central …   3.63   14.0       2.85
+## 3        12 Algeria    GDP_given     Middle East &amp; Nor…  39.9   199.        3.98</code></pre>
+<p>Now, let’s see the ranking of GDP growth by visualization.
+<img src="/blogs/blog_GDP_files/figure-html/GDP_rank_plot_region-1.png" width="576" style="display: block; margin: auto;" />
+<img src="/blogs/blog_GDP_files/figure-html/GDP_rank_plot_country-1.png" width="576" style="display: block; margin: auto;" />
+It turns out South Asia is emerging quickly during this time, while North America has relatively lower % growth in GDP. Still, South Asia is the last but one region in GDP value by 2017. Country-wise, China and Equatorial Guinea have seen the most and second most GDP % growth from 1970 to 2017.</p>
+</div>
+<div id="gdp-components-proportion" class="section level2">
+<h2>GDP Components Proportion</h2>
+<p>We then look at GDP components proportion over years. We selected 3 countries from emerging markets and 3 from mature markets to draw comparison. We reshape data again to suit our specific need.</p>
+<pre class="r"><code>GDP_breakdown &lt;- tidy_GDP_data %&gt;% 
+  pivot_wider(names_from = IndicatorName, values_from = Value) %&gt;% 
+  mutate(`Net Exports` = `Exports` - `Imports`,
+         `GDP_calculated` = `Government expenditure` + 
+           `Gross capital formation` +
+           `Household expenditure` +
+           `Net Exports`)</code></pre>
+<p><img src="/blogs/blog_GDP_files/figure-html/patchwork-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>Graph above shows a visible difference between emerging and mature markets. Countries on the left (emerging markets) generally experience more significant variations in GDP structure in comparison with countries on the right (mature markets). The overall higher percentage of government expenditure on the right could be related to the general higher living standards in mature markets.</p>
+<p>Both China and India have witnessed growing proportion of Gross Capital Formation and decreasing Household Expenditure during this period. This indicates that investment has been an important booster for GDP growth and could be explained by their ample workforce and favoring policy for investments. In China, Gross Capital Formation grew rapidly between 2000 and 2010, and makes up more in GDP in China than either of the other two countries by the end of given period. This is partly because of continuous investment attracted by China’s opening-up, as well as the return of Hong Kong (1997) and Macau (1999), which gave business investment another boost.</p>
+</div>
+<div id="details" class="section level2">
+<h2>Details</h2>
+<p><strong>Adapted from:</strong>
+<em>Assignment from <a href="https://mam2021.netlify.app">Applied Statistics with R</a>, London Business School </em></p>
+<p><strong>Course Instructor:</strong>
+<em><a href="https://www.london.edu/faculty-and-research/faculty-profiles/k/kostis-christodoulou">Kostis Christodoulou</a></em></p>
+<p><strong>Original assignment collaborated with:</strong>
+<em>Study Group 11: Abhinav Bhardwaj, Alberto Lambert, Anna Plaschke, Bartek Makuch,, Feiyang Ni</em></p>
+</div>
+
+                        </div>
+                    </section>
+            <!-- Disqus Inject -->
+                
+            </div>
+            
+        <!-- Footer -->
+            
+                <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                
+                    <li><a href="https://www.instagram.com/scarlettliu25/" class="icon alt fa-instagram" target="_blank"><span class="label">instagram</span></a></li>
+                
+                    <li><a href="www.linkedin.com/in/sijia-liu1" class="icon alt fa-linkedin" target="_blank"><span class="label">LinkedIn</span></a></li>
+                
+                    <li><a href="https://www.github.com" class="icon alt fa-github" target="_blank"><span class="label">GitHub</span></a></li>
+                
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Sijia Liu</li>
+                
+                <li> <a href=""></a></li>
+                
+            </ul>
+        </div>
+    </footer>
+
+            
+        </div>
+
+    <!-- Scripts -->
+        <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+
+    
+
+    <!-- Main JS -->
+    <script src="/js/main.js"></script>
+
+    
+
+    
+
+    </body>
+</html>
