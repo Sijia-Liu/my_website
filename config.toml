@@ -186,12 +186,12 @@ theme = "forty"
 
     [[params.footer.social]]
       icon = "fa-linkedin"
-      url= "www.linkedin.com/in/sijia-liu1"
+      url= "https://www.linkedin.com/in/sijia-liu1"
       label = "LinkedIn"
       
     [[params.footer.social]]
       icon = "fa-github"
-      url= "https://www.github.com"
+      url= "https://github.com/Sijia-Liu"
       label = "GitHub"
 
     [[params.footer.quicklinks]]
