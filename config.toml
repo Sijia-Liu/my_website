@@ -38,7 +38,7 @@ theme = "forty"
   # Navigation Section
   [params.navigation]
     title = "Sijia Liu"
-    #subtitle = "By HTML5 Up"
+    subtitle = "portfolio website"
     menu = "Menu"
     # Optional logo as brand stored in img/
     # logo = "logo.png"
