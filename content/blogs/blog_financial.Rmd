@@ -211,7 +211,7 @@ ggplot(summary_monthly_stock_returns, aes(x=SD, y=mean, label=symbol)) +
 *[Kostis Christodoulou](https://www.london.edu/faculty-and-research/faculty-profiles/k/kostis-christodoulou)*
 
 **Original assignment collaborated with:**
-*Study Group 11: Abhinav Bhardwaj, Alberto Lambert, Anna Plaschke, Bartek Makuch,, Feiyang Ni*
+*Study Group 11: Abhinav Bhardwaj, Alberto Lambert, Anna Plaschke, Bartek Makuch, Feiyang Ni*
 
 
 
