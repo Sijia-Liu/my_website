@@ -6,10 +6,20 @@
     <description>Recent content on Sijia Liu</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 10 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 27 Oct 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Save our planet with data science</title>
+      <link>/blogs/blog4/</link>
+      <pubDate>Tue, 27 Oct 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/blogs/blog4/</guid>
+      <description>Background I was honored to participate in 2020 Bain Data Challenge during the week of Oct 19, 2020. This year’s data challenge is in cooperation with The Natural Conservancy. Our topic is to use features of Wisconsin’s land in 2001, including the elevate, forest area etc. to predict the area of urban land in 2016.
+After a week of exploring, I had a chance to present my insights in front of consultants, data scientists from Bain, as well as experts from The Natural Conservancy.</description>
+    </item>
     
     <item>
       <title>GDP Analysis</title>

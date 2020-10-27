@@ -96,16 +96,22 @@ theme = "forty"
       subtitle = "My Resume"
       image = "picme.jpeg"
       url = "resume.html"
+
+    [[params.tiles.showcase]]
+      title = "2020 Bain Hackathon"
+      subtitle = "Save our planet with data science"
+      image = "picnature.jpg"
+      url = "blogs/blog4"
       
     [[params.tiles.showcase]]
       title = "GDP Analysis"
-      subtitle = "1970 - 2017 GDP Changes"
+      subtitle = "1970 - 2017 GDP changes"
       image = "picGDPtile.jpg"
       url = "blogs/blog1"
 
     [[params.tiles.showcase]]
       title = "NYSE Stock Analysis"
-      subtitle = "Which NYSE Stock to choose?"
+      subtitle = "Which NYSE stock to choose?"
       image = "picstock.png"
       url = "blogs/blog2"
       

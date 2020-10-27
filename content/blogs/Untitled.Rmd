@@ -1,0 +1,50 @@
+---
+categories:
+- ""
+- ""
+date: "2020-10-27"
+description: "Save our planet with data science"
+draft: false
+image: picnature.jpg
+keywords: ""
+slug: blog4
+title: Save our planet with data science
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r, include=FALSE}
+library(knitr)
+library(here)
+```
+
+## Background
+I was honored to participate in 2020 Bain Data Challenge during the week of Oct 19, 2020. This year's data challenge is in cooperation with The Natural Conservancy. Our topic is to use features of Wisconsin's land in 2001, including the elevate, forest area etc. to predict the area of urban land in 2016. 
+
+After a week of exploring, I had a chance to present my insights in front of consultants, data scientists from Bain, as well as experts from The Natural Conservancy. I also met a lot of talented fellow data enthusiasts and had so much fun.
+
+## Final Presentation
+
+```{r, echo=FALSE}
+knitr::include_graphics(here::here("data", "幻灯片1.jpg"))
+```
+```{r, echo=FALSE}
+knitr::include_graphics(here::here("data", "幻灯片2.jpg"))
+```
+```{r, echo=FALSE}
+knitr::include_graphics(here::here("data", "幻灯片3.jpg"))
+```
+```{r, echo=FALSE}
+knitr::include_graphics(here::here("data", "幻灯片4.jpg"))
+```
+```{r, echo=FALSE}
+knitr::include_graphics(here::here("data", "幻灯片5.jpg"))
+```
+```{r, echo=FALSE}
+knitr::include_graphics(here::here("data", "幻灯片6.jpg"))
+```
+```{r, echo=FALSE}
+knitr::include_graphics(here::here("data", "幻灯片7.jpg"))
+```
