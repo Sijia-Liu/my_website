@@ -27,24 +27,15 @@ After a week of exploring, I had a chance to present my insights in front of con
 
 ## Final Presentation
 
-```{r, echo=FALSE}
-knitr::include_graphics(here::here("data", "幻灯片1.jpg"))
-```
-```{r, echo=FALSE}
-knitr::include_graphics(here::here("data", "幻灯片2.jpg"))
-```
-```{r, echo=FALSE}
-knitr::include_graphics(here::here("data", "幻灯片3.jpg"))
-```
-```{r, echo=FALSE}
-knitr::include_graphics(here::here("data", "幻灯片4.jpg"))
-```
-```{r, echo=FALSE}
-knitr::include_graphics(here::here("data", "幻灯片5.jpg"))
-```
-```{r, echo=FALSE}
-knitr::include_graphics(here::here("data", "幻灯片6.jpg"))
-```
-```{r, echo=FALSE}
-knitr::include_graphics(here::here("data", "幻灯片7.jpg"))
-```
+![幻灯片1.jpg](https://i.loli.net/2020/10/28/XIqVdrB8jhDwfYb.jpg)
+
+![幻灯片2.jpg](https://i.loli.net/2020/10/28/gB6PezoAkLD8ViT.jpg)
+![幻灯片3.jpg](https://i.loli.net/2020/10/28/hoRYS8mbsplCEK6.jpg)
+
+![幻灯片4.jpg](https://i.loli.net/2020/10/28/fdvNal6gHnOcQbB.jpg)
+
+![幻灯片5.jpg](https://i.loli.net/2020/10/28/mgLkWrnUvbhz5Bc.jpg)
+![幻灯片6.jpg](https://i.loli.net/2020/10/28/75EkbBinylms8ST.jpg)
+![幻灯片7.jpg](https://i.loli.net/2020/10/28/fQ1dk4CM3VJLyX2.jpg)
+
+
