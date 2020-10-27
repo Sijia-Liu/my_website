@@ -148,7 +148,7 @@ glimpse(myStocks) # examine the structure of the resulting data frame</code></pr
 ## $ low      &lt;dbl&gt; 43.0, 43.3, 43.9, 44.2, 42.7, 43.0, 43.4, 44.2, 44.2, 44.5,…
 ## $ close    &lt;dbl&gt; 43.6, 44.2, 44.7, 44.5, 43.6, 43.4, 43.6, 44.7, 44.5, 44.9,…
 ## $ volume   &lt;dbl&gt; 43278500, 40036800, 50032500, 31606200, 69579400, 30098100,…
-## $ adjusted &lt;dbl&gt; 33.3, 33.8, 34.2, 34.0, 33.4, 33.2, 33.4, 34.2, 34.0, 34.4,…</code></pre>
+## $ adjusted &lt;dbl&gt; 33.0, 33.5, 33.9, 33.7, 33.1, 32.9, 33.1, 33.9, 33.7, 34.0,…</code></pre>
 <p>Now we calculate the daily, monthly and yearly returns using <code>tidyquant::tq_transmute</code> And investigate their common statistics of monthly returns.</p>
 <pre class="r"><code>#calculate daily returns
 myStocks_returns_daily &lt;- myStocks %&gt;%
@@ -400,7 +400,7 @@ ggplot(summary_monthly_stock_returns, aes(x=SD, y=mean, label=symbol)) +
 <p><strong>Course Instructor:</strong>
 <em><a href="https://www.london.edu/faculty-and-research/faculty-profiles/k/kostis-christodoulou">Kostis Christodoulou</a></em></p>
 <p><strong>Original assignment collaborated with:</strong>
-<em>Study Group 11: Abhinav Bhardwaj, Alberto Lambert, Anna Plaschke, Bartek Makuch,, Feiyang Ni</em></p>
+<em>Study Group 11: Abhinav Bhardwaj, Alberto Lambert, Anna Plaschke, Bartek Makuch, Feiyang Ni</em></p>
 </div>
 
                         </div>
